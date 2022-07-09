@@ -28,7 +28,7 @@ export function IssueItem({
       </div>
       <div className="issue-content">
         <span>
-          <Link to={`/issues/${number}`}>{title}</Link>
+          <Link to={`/issue/${number}`}>{title}</Link>
           {labels.map((label) => (
             <Label key={label} label={label} />
           ))}

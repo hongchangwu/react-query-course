@@ -6,18 +6,20 @@ export default function IssuesList({ labels, status }) {
   const [search, setSearch] = useState("");
   const searchQuery = useQuery(
     ["issues", "search", search],
-    () => {
-      return fetch(`/api/search/issues?q=${search}`).then((res) => res.json());
+    ({ signal }) => {
+      return fetch(`/api/search/issues?q=${search}`, { signal }).then((res) =>
+        res.json()
+      );
     },
     {
       enabled: search !== "",
     }
   );
-  const issuesQuery = useQuery(["issues", { labels, status }], () => {
+  const issuesQuery = useQuery(["issues", { labels, status }], ({ signal }) => {
     const labelsString = labels.map((label) => `labels[]=${label}`).join("&");
     const statusString = status ? `&status=${status}` : "";
-    return fetch(`/api/issues?${labelsString}${statusString}`).then((res) =>
-      res.json()
+    return fetch(`/api/issues?${labelsString}${statusString}`, { signal }).then(
+      (res) => res.json()
     );
   });
   console.debug(searchQuery.data);

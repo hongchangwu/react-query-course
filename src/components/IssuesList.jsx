@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { IssueItem } from "./IssueItem";
+import Loader from "./Loader";
 
 export default function IssuesList({ labels, status }) {
   const [search, setSearch] = useState("");
@@ -49,7 +50,7 @@ export default function IssuesList({ labels, status }) {
         <p>Loading...</p>
       ) : searchQuery.fetchStatus === "idle" && searchQuery.isLoading ? (
         <>
-          <h2>Issues List</h2>
+          <h2>Issues List {issuesQuery.isFetching ? <Loader /> : null}</h2>
           <ul className="issues-list">
             {issuesQuery.data?.map((issue) => (
               <IssueItem

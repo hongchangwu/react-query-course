@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { IssueItem } from "./IssueItem";
 import Loader from "./Loader";
 
@@ -16,12 +16,20 @@ export default function IssuesList({ labels, status }) {
       enabled: search !== "",
     }
   );
-  const issuesQuery = useQuery(["issues", { labels, status }], ({ signal }) => {
+  const queryClient = useQueryClient()
+  const issuesQuery = useQuery(["issues", { labels, status }], async ({ signal }) => {
     const labelsString = labels.map((label) => `labels[]=${label}`).join("&");
     const statusString = status ? `&status=${status}` : "";
-    return fetch(`/api/issues?${labelsString}${statusString}`, { signal }).then(
+    const results = await fetch(`/api/issues?${labelsString}${statusString}`, { signal }).then(
       (res) => res.json()
     );
+
+    results.forEach((issue) => {
+      console.log(`issue=${JSON.stringify(issue)}`)
+      queryClient.setQueryData(["issues", issue.number.toString()], issue)
+    })
+
+    return results
   });
   console.debug(searchQuery.data);
 

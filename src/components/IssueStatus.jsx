@@ -29,7 +29,7 @@ export default function IssueStatus({ status, issueNumber }) {
           queryClient.setQueryData(["issues", issueNumber], (data) => {
             return {
               ...data,
-              oldStatus,
+              status: oldStatus,
             };
           });
         };
@@ -42,6 +42,7 @@ export default function IssueStatus({ status, issueNumber }) {
       },
     }
   );
+
   return (
     <div className="issue-options">
       <div>

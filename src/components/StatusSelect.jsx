@@ -6,10 +6,10 @@ const POSSIBLE_STATUS = [
   { id: "cancelled", name: "Cancelled" },
 ];
 
-export function StatusSelect({ value, onChange }) {
+export function StatusSelect({ value, onChange, noEmptyOption = false }) {
   return (
     <select value={value} onChange={onChange} className="status-select">
-      <option value="">Select a status</option>
+      {noEmptyOption ? null : <option value="">Select a status</option>}
       {POSSIBLE_STATUS.map((status) => (
         <option key={status.id} value={status.id}>
           {status.name}

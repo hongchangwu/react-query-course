@@ -3,8 +3,6 @@ import { useLabelsData } from "../helpers/useLabelsData";
 export default function LabelList({ selected, toggle }) {
   const labelsQuery = useLabelsData();
 
-  console.log(labelsQuery.data);
-
   return (
     <div className="labels ">
       <h3>Labels</h3>

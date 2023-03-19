@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "react-query";
 import { IssueItem } from "./IssueItem";
 import Loader from "./Loader";
 
-export default function IssuesList({ labels, status }) {
+export default function IssuesList({ labels, status, page, setPage }) {
   const [search, setSearch] = useState("");
   const searchQuery = useQuery(
     ["issues", "search", search],
@@ -16,22 +16,26 @@ export default function IssuesList({ labels, status }) {
       enabled: search !== "",
     }
   );
-  const queryClient = useQueryClient()
-  const issuesQuery = useQuery(["issues", { labels, status }], async ({ signal }) => {
-    const labelsString = labels.map((label) => `labels[]=${label}`).join("&");
-    const statusString = status ? `&status=${status}` : "";
-    const results = await fetch(`/api/issues?${labelsString}${statusString}`, { signal }).then(
-      (res) => res.json()
-    );
+  const queryClient = useQueryClient();
+  const issuesQuery = useQuery(
+    ["issues", { labels, status, page }],
+    async ({ signal }) => {
+      const labelsString = labels.map((label) => `labels[]=${label}`).join("&");
+      const statusString = status ? `&status=${status}` : "";
+      const paginationString = page ? `&page=${page}` : "";
+      const results = await fetch(
+        `/api/issues?${labelsString}${statusString}${paginationString}`,
+        { signal }
+      ).then((res) => res.json());
 
-    results.forEach((issue) => {
-      console.log(`issue=${JSON.stringify(issue)}`)
-      queryClient.setQueryData(["issues", issue.number.toString()], issue)
-    })
+      results.forEach((issue) => {
+        queryClient.setQueryData(["issues", issue.number.toString()], issue);
+      });
 
-    return results
-  });
-  console.debug(searchQuery.data);
+      return results;
+    },
+    { keepPreviousData: true }
+  );
 
   return (
     <div>
@@ -74,6 +78,28 @@ export default function IssuesList({ labels, status }) {
               />
             ))}
           </ul>
+          <div className="pagination">
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={page === 1 || issuesQuery.isPreviousData}
+            >
+              Prev
+            </button>
+            <span>
+              Page {page}
+              {issuesQuery.isPreviousData ? " ..." : ""}
+            </span>
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={
+                !issuesQuery.data ||
+                issuesQuery.data.length === 0 ||
+                issuesQuery.isPreviousData
+              }
+            >
+              Next
+            </button>
+          </div>
         </>
       ) : (
         <>
